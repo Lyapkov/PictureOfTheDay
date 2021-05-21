@@ -15,7 +15,7 @@ import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lyapkov.pictureoftheday.R
 import com.lyapkov.pictureoftheday.ui.MainActivity
-import com.lyapkov.pictureoftheday.ui.chips.ChipsFragment
+import com.lyapkov.pictureoftheday.ui.setting.SettingsFragment
 import kotlinx.android.synthetic.main.main_fragment.*
 
 class PictureOfTheDayFragment : Fragment() {
@@ -57,7 +57,10 @@ class PictureOfTheDayFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.app_bar_fav -> toast("Favourite")
-            R.id.app_bar_settings -> activity?.supportFragmentManager?.beginTransaction()?.add(R.id.container, ChipsFragment())?.addToBackStack(null)?.commit()
+            R.id.app_bar_settings -> activity?.supportFragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.container, SettingsFragment())
+                ?.addToBackStack(null)?.commit()
             android.R.id.home -> {
                 activity?.let {
                     BottomNavigationDrawerFragment().show(it.supportFragmentManager, "tag")
