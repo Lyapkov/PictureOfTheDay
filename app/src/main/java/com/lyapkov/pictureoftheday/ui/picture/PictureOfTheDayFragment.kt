@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lyapkov.pictureoftheday.R
 import com.lyapkov.pictureoftheday.ui.MainActivity
 import com.lyapkov.pictureoftheday.ui.setting.SettingsFragment
+import kotlinx.android.synthetic.main.fragment_day_before_yesterday.*
 import kotlinx.android.synthetic.main.main_fragment.*
 
 class PictureOfTheDayFragment : Fragment() {
