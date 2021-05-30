@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.api.ApiActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tab_image_textview"
@@ -13,10 +13,9 @@
         android:drawableStart="@drawable/ic_earth"
         android:drawablePadding="10dp"
         android:gravity="center_vertical"
-        android:text="Today"
+        android:text="Earth"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="15sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
