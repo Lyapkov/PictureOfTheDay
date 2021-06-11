@@ -26,16 +26,14 @@ import com.lyapkov.pictureoftheday.ui.MainActivity
 import com.lyapkov.pictureoftheday.ui.api.ApiActivity
 import com.lyapkov.pictureoftheday.ui.apibottom.ApiBottomActivity
 import com.lyapkov.pictureoftheday.ui.setting.SettingsFragment
+import kotlinx.android.synthetic.main.activity_animations_fab.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.bottom_app_bar
-import kotlinx.android.synthetic.main.fragment_main.fab
 import kotlinx.android.synthetic.main.fragment_main.input_edit_text
 import kotlinx.android.synthetic.main.fragment_main.input_layout
 
 class PictureOfTheDayFragment : Fragment() {
-
-    private var isExpanded = false
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val viewModel: PictureOfTheDayViewModel by lazy {
@@ -52,58 +50,18 @@ class PictureOfTheDayFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        return inflater.inflate(R.layout.fragment_main_start, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBottomSheetBehavior(view.findViewById(R.id.bottom_sheet_container))
-        image_view.setOnClickListener {
-            isExpanded = !isExpanded
-            TransitionManager.beginDelayedTransition(
-                container, TransitionSet()
-                    .addTransition(ChangeBounds())
-                    .addTransition(ChangeImageTransform())
-            )
-
-            val params: ViewGroup.LayoutParams = image_view.layoutParams
-            params.height =
-                if (isExpanded) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
-            image_view.layoutParams = params
-            image_view.scaleType =
-                if (isExpanded) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
-        }
-
-        scroll_view.setOnScrollChangeListener { _, _, _, _, _ ->
-            main_toolbar.isSelected = scroll_view.canScrollVertically(-1)
-        }
-
-        fab_lay.setOnClickListener {
-            if (isExpanded) {
-                collapseFab()
-            } else {
-                expandFAB()
-            }
-        }
-
         input_layout.setEndIconOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("https://en.wikipedia.org/wiki/${input_edit_text.text.toString()}")
             })
         }
         setBottomAppBar(view)
-    }
-
-
-    private fun expandFAB() {
-        isExpanded = true
-        ObjectAnimator.ofFloat(fab_lay, "rotation", 0f, 225f).start()
-    }
-
-    private fun collapseFab() {
-        isExpanded = false
-        ObjectAnimator.ofFloat(fab_lay, "rotation", 0f, -180f).start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -122,8 +80,9 @@ class PictureOfTheDayFragment : Fragment() {
                 )
             }
             R.id.app_bar_settings -> activity?.supportFragmentManager?.beginTransaction()
-                ?.add(R.id.container, SettingsFragment())?.addToBackStack(null)?.commit()
-            R.id.home -> {
+                ?.add(R.id.container, SettingsFragment())?.addToBackStack(null)
+                ?.commitAllowingStateLoss()
+            android.R.id.home -> {
                 activity?.let {
                     BottomNavigationDrawerFragment().show(it.supportFragmentManager, "tag")
                 }
