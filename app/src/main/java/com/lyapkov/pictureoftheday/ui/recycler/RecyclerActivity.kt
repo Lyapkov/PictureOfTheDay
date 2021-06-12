@@ -1,5 +1,6 @@
 package com.lyapkov.pictureoftheday.ui.recycler
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
@@ -7,12 +8,14 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lyapkov.pictureoftheday.R
 import kotlinx.android.synthetic.main.activity_recycler.*
 import kotlinx.android.synthetic.main.activity_recycler_item_earth.view.*
@@ -49,7 +52,7 @@ class RecyclerActivity : AppCompatActivity() {
         )
 
         recyclerView.adapter = adapter
-        recyclerActivityFAB.setOnClickListener { adapter.appendItem() }
+        recyclerActivityFAB.setOnClickListener { adapter.dialog(this) }
         itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
         itemTouchHelper.attachToRecyclerView(recyclerView)
         recyclerActivityDiffUtilFAB.setOnClickListener { changeAdapterData() }
@@ -160,6 +163,21 @@ class RecyclerActivityAdapter(
         result.dispatchUpdatesTo(this)
         data.clear()
         data.addAll(newItems)
+    }
+
+    fun dialog(context: Context) {
+        val builder =  MaterialAlertDialogBuilder(context)
+            .setView(R.layout.dialog_add_note)
+
+                builder.setTitle("Добавьте заметку")
+            .setNegativeButton("Отменить") { dialog, which ->
+                dialog.cancel()
+            }
+            .setPositiveButton("Сохранить") { dialog, which ->
+
+                appendItem()
+            }
+            .show()
     }
 
     fun appendItem() {
