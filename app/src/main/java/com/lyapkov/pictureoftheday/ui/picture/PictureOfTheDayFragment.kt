@@ -1,8 +1,14 @@
 package com.lyapkov.pictureoftheday.ui.picture
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.BulletSpan
+import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +50,10 @@ class PictureOfTheDayFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.let {
+            text_view.typeface =
+                Typeface.createFromAsset(it.assets, "AndroidInsomniaRegular-RLxW.ttf")
+        }
         setBottomSheetBehavior(view.findViewById(R.id.bottom_sheet_container))
         input_layout.setEndIconOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
@@ -95,6 +105,9 @@ class PictureOfTheDayFragment : Fragment() {
                         lifecycle(this@PictureOfTheDayFragment)
                         error(R.drawable.ic_load_error_vector)
                         placeholder(R.drawable.ic_no_photo_vector)
+                        serverResponseData.explanation?.let {
+                            text_view.text = spanning(it)
+                        }
                     }
                 }
             }
@@ -106,6 +119,17 @@ class PictureOfTheDayFragment : Fragment() {
                 toast(data.error.message)
             }
         }
+    }
+
+    private fun spanning(text: String): SpannableStringBuilder {
+        val spannable = SpannableStringBuilder(text)
+        spannable.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(requireContext(), R.color.colorAccent)
+            ),
+            1, spannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannable
     }
 
     private fun setBottomAppBar(view: View) {
