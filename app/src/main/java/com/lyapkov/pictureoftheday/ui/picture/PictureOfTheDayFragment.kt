@@ -121,8 +121,8 @@ class PictureOfTheDayFragment : Fragment() {
         }
     }
 
-    private fun spanning(text: String): SpannableStringBuilder {
-        val spannable = SpannableStringBuilder(text)
+    private fun spanning(text: String): SpannableString {
+        val spannable = SpannableString(text)
         spannable.setSpan(
             ForegroundColorSpan(
                 ContextCompat.getColor(requireContext(), R.color.colorAccent)
