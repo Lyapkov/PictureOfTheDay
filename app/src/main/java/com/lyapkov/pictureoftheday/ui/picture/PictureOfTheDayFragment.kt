@@ -1,10 +1,18 @@
 package com.lyapkov.pictureoftheday.ui.picture
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.ChangeImageTransform
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.view.*
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -18,9 +26,16 @@ import com.lyapkov.pictureoftheday.ui.MainActivity
 import com.lyapkov.pictureoftheday.ui.api.ApiActivity
 import com.lyapkov.pictureoftheday.ui.apibottom.ApiBottomActivity
 import com.lyapkov.pictureoftheday.ui.setting.SettingsFragment
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_main.bottom_app_bar
+import kotlinx.android.synthetic.main.fragment_main.fab
+import kotlinx.android.synthetic.main.fragment_main.input_edit_text
+import kotlinx.android.synthetic.main.fragment_main.input_layout
 
 class PictureOfTheDayFragment : Fragment() {
+
+    private var isExpanded = false
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val viewModel: PictureOfTheDayViewModel by lazy {
@@ -40,15 +55,55 @@ class PictureOfTheDayFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBottomSheetBehavior(view.findViewById(R.id.bottom_sheet_container))
+        image_view.setOnClickListener {
+            isExpanded = !isExpanded
+            TransitionManager.beginDelayedTransition(
+                container, TransitionSet()
+                    .addTransition(ChangeBounds())
+                    .addTransition(ChangeImageTransform())
+            )
+
+            val params: ViewGroup.LayoutParams = image_view.layoutParams
+            params.height =
+                if (isExpanded) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+            image_view.layoutParams = params
+            image_view.scaleType =
+                if (isExpanded) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
+        }
+
+        scroll_view.setOnScrollChangeListener { _, _, _, _, _ ->
+            main_toolbar.isSelected = scroll_view.canScrollVertically(-1)
+        }
+
+        fab_lay.setOnClickListener {
+            if (isExpanded) {
+                collapseFab()
+            } else {
+                expandFAB()
+            }
+        }
+
         input_layout.setEndIconOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("https://en.wikipedia.org/wiki/${input_edit_text.text.toString()}")
             })
         }
         setBottomAppBar(view)
+    }
+
+
+    private fun expandFAB() {
+        isExpanded = true
+        ObjectAnimator.ofFloat(fab_lay, "rotation", 0f, 225f).start()
+    }
+
+    private fun collapseFab() {
+        isExpanded = false
+        ObjectAnimator.ofFloat(fab_lay, "rotation", 0f, -180f).start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -58,7 +113,14 @@ class PictureOfTheDayFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.app_bar_fav -> activity?.let { startActivity(Intent(it, ApiBottomActivity::class.java)) }
+            R.id.app_bar_fav -> activity?.let {
+                startActivity(
+                    Intent(
+                        it,
+                        ApiBottomActivity::class.java
+                    )
+                )
+            }
             R.id.app_bar_settings -> activity?.supportFragmentManager?.beginTransaction()
                 ?.add(R.id.container, SettingsFragment())?.addToBackStack(null)?.commit()
             R.id.home -> {
